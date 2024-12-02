@@ -82,12 +82,25 @@ async function run() {
     });
 
     // User related apis
+    app.get('/users', async(req,res)=>{
+      const cursor = userCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    })
+    // create a user
     app.post("/users", async (req, res) => {
       const newUser = req.body;
       console.log("Creating new user", newUser);
       const result = await userCollection.insertOne(newUser);
       res.send(result);
     });
+    // delete a user
+    app.get('/users/:id', async(req,res)=>{
+      const id = req.params.id;
+      const quary = {_id: new ObjectId(id)};
+      const result = await userCollection.deleteOne(quary);
+      res.send(result);
+    })
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
