@@ -25,21 +25,21 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
 
-    const coffeeCollection = client.db('CoffeeDB').collection('coffee');
+    const coffeeCollection = client.db("CoffeeDB").collection("coffee");
 
-    app.get('/coffee', async (req,res)=>{
+    app.get("/coffee", async (req, res) => {
       const cursor = coffeeCollection.find();
       const result = await cursor.toArray();
       res.send(result);
     });
 
-    // update
-    app.get('/coffee/:id', async (req,res)=>{
+    // get a coffee for update
+    app.get("/coffee/:id", async (req, res) => {
       const id = req.params.id;
-      const quary = {_id: new ObjectId(id)};
+      const quary = { _id: new ObjectId(id) };
       const result = await coffeeCollection.findOne(quary);
       res.send(result);
-    })
+    });
 
     // post/create
     app.post("/coffee", async (req, res) => {
@@ -49,13 +49,34 @@ async function run() {
       res.send(result);
     });
 
+    // update
+    app.put("/coffee/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const options = { upsert: true };
+      const updatedCoffee = req.body;
+      const coffee = {
+        $set: {
+          name: updatedCoffee.name,
+          quantity: updatedCoffee.quantity,
+          supplier: updatedCoffee.supplier,
+          taste: updatedCoffee.taste,
+          category: updatedCoffee.category,
+          details: updatedCoffee.details,
+          photo: updatedCoffee.photo,
+        },
+      };
+      const result = await coffeeCollection.updateOne(filter, coffee, options);
+      res.send(result);
+    });
+
     // delete
-    app.delete('/coffee/:id', async(req,res)=>{
-      const id= req.params.id;
-      const quary = {_id: new ObjectId(id)}
+    app.delete("/coffee/:id", async (req, res) => {
+      const id = req.params.id;
+      const quary = { _id: new ObjectId(id) };
       const result = await coffeeCollection.deleteOne(quary);
       res.send(result);
-    })
+    });
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
