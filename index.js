@@ -95,7 +95,7 @@ async function run() {
       res.send(result);
     });
     // delete a user
-    app.get('/users/:id', async(req,res)=>{
+    app.delete('/users/:id', async(req,res)=>{
       const id = req.params.id;
       const quary = {_id: new ObjectId(id)};
       const result = await userCollection.deleteOne(quary);
